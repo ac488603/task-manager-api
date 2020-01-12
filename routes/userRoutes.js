@@ -4,13 +4,16 @@ const router =  new express.Router();
 const User = require('../models/User');
 
 //create a new user
-router.post('/users', (req, res) => {
-    const tempUsr = User(req.body); 
-    tempUsr.save().then((usr) => {
-        res.status(201).send(usr); 
-    }).catch((err) => {
+router.post('/users', async (req, res) => {
+    const Usr = User(req.body);
+
+    try {
+        const token = await Usr.generateAuthToken(); 
+        await Usr.save();
+        res.status(201).send({usr, token}); 
+    } catch (error) {
         res.status(400).send(err);
-    });
+    }
 });
 
 
@@ -86,9 +89,13 @@ router.delete('/users/:id', async(req,res) => {
 router.post('/users/login', async (req,res) => {
     try {
         const usr =  await User.findByCredentials(req.body.email,req.body.password);
-        res.send(usr);
+        const token = await usr.generateAuthToken();
+
+        res.send({usr,token});
     } catch(e) {
+        console.log(e);
         res.status(400).send()
     } 
 })
+
 module.exports = router; 

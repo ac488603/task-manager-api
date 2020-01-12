@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
     name : {
@@ -45,11 +46,27 @@ const userSchema = new mongoose.Schema({
                 }
             }
         }
-    }
+    },
+    tokens : [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
 });
 
+//instance method -> belongs to a instance
+userSchema.methods.generateAuthToken = async function () {
+    const user = this;
+    const token = jwt.sign({_id: user._id.toString()}, 'somesecretsecret');
+    user.tokens.push({token});
+    await user.save();
+    return token;
+}
+
 //when throwing errors for authentication it is best to be generic
-//it exposes less information  
+//it exposes less information
+//Model method -> belongs to the model  
 userSchema.statics.findByCredentials = async (email, password) => {
     const user =  await User.findOne({email}); 
     
