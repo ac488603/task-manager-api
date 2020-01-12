@@ -45,7 +45,7 @@ router.patch('/users/:id', async (req,res) => {
     const isValid = potentialUpdates.every( item => allowedUpdates.includes(item));
 
     if(!isValid){
-        return res.status(400).send({error:`not a valid update`});
+        return res.status(400).send({error:`Not a valid update.`});
     }
     try {
 

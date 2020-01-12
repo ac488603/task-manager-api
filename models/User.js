@@ -69,7 +69,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
 //mongoose middleware can only be set up on the user schema.
 //this function runs before the save function.  
 // it checks to see if the password field was modified on the user object
-//if it is modified the new password is hashed.
+//if it is modified the new password is hashed
 userSchema.pre('save', async function (next) {
     const user = this; 
 
