@@ -6,13 +6,16 @@ const auth = async (req,res,next) => {
         const token  =  req.header('Authorization').replace('Bearer ','');
         const payload = jwt.verify(token,'somesecretsecret' ); 
         const usr  = await User.findOne({_id: payload._id,  'tokens.token' : token});
-        req.user = usr;
 
+        if(!usr){
+            throw new Error();
+        }
+        req.user = usr;
+        req.token = token;
+        next();
     } catch (error) {
         res.status(401).send({ error : 'Authentication failed.'})
     }
-
-    next();
 }
 
 module.exports = auth; 

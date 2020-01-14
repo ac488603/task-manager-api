@@ -10,16 +10,15 @@ router.post('/users', async (req, res) => {
 
     try {
         const token = await Usr.generateAuthToken(); 
-        await Usr.save();
-        res.status(201).send({usr, token}); 
+        res.status(201).send({Usr, token}); 
     } catch (error) {
-        res.status(400).send(err);
+        res.status(400).send(error);
     }
 });
 
 
 // get all users
-router.get('/users', auth,(req,res) => {
+router.get('/users/me', auth,(req,res) => {
     res.send(req.user);
 });
 
@@ -66,11 +65,10 @@ router.patch('/users/:id', async (req,res) => {
 });
 
 //delete and return the user
-router.delete('/users/:id', async(req,res) => {
-    const _id = req.params.id;
+router.delete('/users/me', auth, async (req,res) => {
     
     try {
-        const usr = await User.findByIdAndDelete({_id}); 
+        const user = req.user.remove();
         if(!usr){
             return res.status(404).send();
         }
@@ -90,9 +88,30 @@ router.post('/users/login', async (req,res) => {
 
         res.send({usr,token});
     } catch(e) {
-        console.log(e);
         res.status(400).send()
     } 
-})
+});
+
+router.post('/users/logout', auth, async (req,res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter( tkn => tkn.token !== req.token);
+        await req.user.save();
+
+        res.send('logged out');
+    } catch (error) {
+        res.status(500).send();
+    }
+});
+
+router.post('/users/logoutall', auth , async (req,res) => {
+    try {
+        req.user.tokens = [];
+        await req.user.save();
+        res.send(req.user);
+    } catch (error) {
+        res.status(500).send()
+    }
+} );
+
 
 module.exports = router; 
