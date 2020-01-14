@@ -55,6 +55,16 @@ const userSchema = new mongoose.Schema({
     }]
 });
 
+//instance method to remove private data
+// this function is called by the send function 
+userSchema.methods.toJSON = function () {
+    const user = this;
+    const userObj = user.toObject();
+    delete userObj.password;
+    delete userObj.tokens;
+    return userObj;
+}
+
 //instance method -> belongs to a instance
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
