@@ -24,7 +24,7 @@ router.get('/users/me', auth,(req,res) => {
 
 
 //edit a user by id
-router.patch('/users/:id', async (req,res) => {
+router.patch('/users/:id', auth, async (req,res) => {
     const _id = req.params.id;
     const potentialUpdates = Object.keys(req.body); 
     const allowedUpdates = ['name', 'email', 'password', 'age'];
@@ -56,11 +56,8 @@ router.patch('/users/:id', async (req,res) => {
 router.delete('/users/me', auth, async (req,res) => {
     
     try {
-        const user = req.user.remove();
-        if(!usr){
-            return res.status(404).send();
-        }
-        res.send(usr);
+        await req.user.remove();
+        res.send(req.user);
     } catch (error) {
         res.status(500).send(error);
     }
