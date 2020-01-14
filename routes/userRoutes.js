@@ -22,18 +22,6 @@ router.get('/users/me', auth,(req,res) => {
     res.send(req.user);
 });
 
-//get a user by id
-router.get('/users/:id', (req, res) => {
-    const _id = req.params.id;
-    User.findById(_id).then( usr => {
-        if(!usr){
-            return res.status(404).send();
-        }
-        res.send(usr);
-    }).catch( err => {
-        res.status(500).send(); 
-    })
-});
 
 //edit a user by id
 router.patch('/users/:id', async (req,res) => {
