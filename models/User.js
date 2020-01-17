@@ -55,6 +55,15 @@ const userSchema = new mongoose.Schema({
     }]
 });
 
+//virtual properties are not stored in the database
+//They are used by mongoose to create an index.  The index stores 
+//a relationship between models
+
+userSchema.virtual('tasks', {
+    ref : 'Task',
+    localField :'_id',
+    foreignField: 'author' //name of field on other model
+});
 //instance method to remove private data
 // this function is called by the send function 
 userSchema.methods.toJSON = function () {

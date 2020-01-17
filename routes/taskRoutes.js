@@ -1,40 +1,30 @@
 const express = require('express'); 
 const router =  new express.Router(); 
-
+const auth = require('./middleware/auth');
 const Task = require('../models/Task');
 
 // create a task 
-router.post('/tasks', (req,res) => {
-    const tempTask = Task(req.body); 
-    tempTask.save().then( tsk => {
-         res.status(201).send(tsk);
-    }).catch( err => {
-         res.status(400).send(err); 
-    });
+router.post('/tasks', auth, async (req,res) => {
+    const tsk = Task({...req.body, author : req.user._id}); 
+
+    try {
+        await tsk.save();
+        res.status(201).send(tsk);
+    } catch (error) {
+        res.status(400).send();
+    }
 });
 
 
 // get all tasks
-router.get('/tasks', (req,res) => {
-    Task.find().then( tsks => {
-        res.send(tsks);
-    }).catch( err => {
-        res.status(500).send();
-    })
-});
+router.get('/tasks',auth, async (req,res) => {
 
-
-//get a task by id
-router.get('/tasks/:id', (req, res) => {
-    const _id = req.params.id;
-    Task.findById(_id).then( tsk => {
-        if(!tsk){
-            return res.status(404).send();
-        }
-        res.send(tsk);
-    }).catch( err => {
-        res.status(500).send(); 
-    })
+    try {
+        await req.user.populate('tasks').execPopulate();
+        res.send(req.user.tasks);
+    } catch (error) {
+        res.status(500).send()
+    }
 });
 
 
