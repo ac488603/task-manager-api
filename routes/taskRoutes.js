@@ -28,8 +28,23 @@ router.get('/tasks',auth, async (req,res) => {
 });
 
 
+//get a task by id
+router.get('/tasks/:id', auth, async (req, res) => {
+
+    try {
+        const task = await Task.findOne({_id: req.params.id , author : req.user._id});
+        if(!task){
+            return res.status(404).send()
+        }
+        res.send(task);
+    } catch (error) {
+        res.status(500).send()
+    }
+});
+
+
 //edit a user by id
-router.patch('/tasks/:id', async (req,res) => {
+router.patch('/tasks/:id', auth, async (req,res) => {
     const _id = req.params.id;
     const potentialUpdates = Object.keys(req.body); 
     const allowedUpdates = ['description'];
@@ -39,14 +54,18 @@ router.patch('/tasks/:id', async (req,res) => {
     if(!isValid){
         return res.status(400).send({error:`not a valid update`});
     }
+
+
     try {
-        const usr = await Task.findByIdAndUpdate(_id, req.body, {new: true, runValidators: true});
+        const tsk = await Task.findOne({_id, author: req.user._id});
         
-        if(!usr){
+        if(!tsk){
             return res.status(404).send();
         }
 
-        res.send(usr); 
+        potentialUpdates.forEach(update => tsk[update] = req.body[update] );
+        await tsk.save();
+        res.send(tsk); 
     } catch (error) {
         res.status(500).send(error);
     }
