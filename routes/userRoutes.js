@@ -11,7 +11,6 @@ const User = require('../models/User');
 // The multer object can also receive a file filter option. This option allows the
 // developer to specify which files the server will accept.
 const upload = multer({
-    dest:'avatars',
         limits : {
             fileSize : 1000000,
         },
@@ -21,12 +20,6 @@ const upload = multer({
             }
             cb(undefined, true);
         }
-});
-
-router.post('/users/me/avatar', upload.single('avatar') ,(req,res) => {
-    res.send();
-},(error, req,res, next) => {
-    res.status(400).send({error : error.message});
 });
 
 //create a new user
@@ -41,6 +34,26 @@ router.post('/users', async (req, res) => {
     }
 });
 
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req,res) => {
+    req.user.avatar = req.file.buffer;
+    await req.user.save();
+    res.send();
+},(error, req,res, next) => {
+    res.status(400).send({error : error.message});
+});
+
+router.delete('/users/me/avatar', auth, async (req,res) => {
+    if(req.user.avatar === undefined){
+        res.status(404).send({message : 'no image exists'})
+    }
+    req.user.avatar = undefined; 
+    try {
+        await req.user.save();
+        res.send()
+    }catch{
+        res.status(500).send()
+    }
+})
 
 // get all users
 router.get('/users/me', auth,(req,res) => {
