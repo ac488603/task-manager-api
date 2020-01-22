@@ -6,9 +6,21 @@ const multer = require('multer');
 
 const User = require('../models/User');
 
-
+// The file size option recieves a size in bytes. So 1000000 bytes = 1mb.
+// Any file larger than 1mb will be rejected. 
+// The multer object can also receive a file filter option. This option allows the
+// developer to specify which files the server will accept.
 const upload = multer({
-    dest:'avatars'
+    dest:'avatars',
+        limits : {
+            fileSize : 1000000,
+        },
+        fileFilter(req,file,cb) {
+            if(!file.originalname.match(/\.(jpg|jpeg|png)$/) ){
+              return cb(new Error('Please upload an image file.'));
+            }
+            cb(undefined, true);
+        }
 });
 
 router.post('/users/me/avatar', upload.single('avatar') ,(req,res) => {
