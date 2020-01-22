@@ -3,6 +3,14 @@ const app = express();
 const PORT =  process.env.PORT || 3000;
 require('./src/db/mongoose'); // This forces the script to run. 
 
+const multer =  require('multer');
+const upload = multer({
+    dest: 'images'
+});
+
+app.post('/upload', upload.single('upload') ,(req,res) => {
+    res.send()
+})
 //import routers 
 const userRouter = require('./routes/userRoutes');
 const taskRouter = require('./routes/taskRoutes');
