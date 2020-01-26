@@ -28,10 +28,7 @@ app.get('/', (req, res) => {
 }); 
 
 
-
 app.listen(PORT, (_) => {
     console.log(`Server Listening on port ${PORT}`); 
 }); 
-
-
 
