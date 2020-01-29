@@ -4,6 +4,8 @@ const auth = require('./middleware/auth');
 const multer = require('multer');
 const sharp = require('sharp');
 
+const email = require('../email');
+
 const User = require('../models/User');
 
 // The file size option recieves a size in bytes. So 1000000 bytes = 1mb.
@@ -28,6 +30,7 @@ router.post('/users', async (req, res) => {
 
     try {
         const token = await Usr.generateAuthToken(); 
+        email.sendWelcomemsg(Usr.email,Usr.name);
         res.status(201).send({Usr, token}); 
     } catch (error) {
         res.status(400).send(error);
@@ -69,7 +72,6 @@ router.delete('/users/me/avatar', auth, async (req,res) => {
     }
 })
 
-// get all users
 router.get('/users/me', auth,(req,res) => {
     res.send(req.user);
 });
@@ -101,6 +103,7 @@ router.delete('/users/me', auth, async (req,res) => {
     
     try {
         await req.user.remove();
+        email.sendCanelationMessage(req.user.email,req.user.name);
         res.send(req.user);
     } catch (error) {
         res.status(500).send(error);
