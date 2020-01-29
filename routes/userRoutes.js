@@ -64,7 +64,7 @@ router.delete('/users/me/avatar', auth, async (req,res) => {
     try {
         await req.user.save();
         res.send()
-    }catch{
+    }catch (error){
         res.status(500).send()
     }
 })
