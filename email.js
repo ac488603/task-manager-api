@@ -5,7 +5,7 @@ const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 
-const sendWelcomemsg = (to, name) => {
+const sendWelcomeMsg = (to, name) => {
   sgMail.send({
     to,
     from : "test@example.com",
@@ -14,7 +14,7 @@ const sendWelcomemsg = (to, name) => {
   })
 }
 
-const sendCanelationMessage = (to, name) => {
+const sendCancelationMsg = (to, name) => {
   sgMail.send({
     to,
     from: "test@example.com",
@@ -23,4 +23,4 @@ const sendCanelationMessage = (to, name) => {
   })
 }
 
-module.exports = {sendWelcomemsg, sendCanelationMessage}; 
+module.exports = {sendWelcomeMsg, sendCancelationMsg}; 

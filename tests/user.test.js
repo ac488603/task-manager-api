@@ -19,6 +19,7 @@ const userOne = {
 beforeEach(async () => {
     await User.deleteMany();
     await new User(userOne).save();
+    
 })
 
 test('should signup new user', async () => {

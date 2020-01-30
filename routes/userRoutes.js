@@ -30,7 +30,7 @@ router.post('/users', async (req, res) => {
 
     try {
         const token = await Usr.generateAuthToken(); 
-        email.sendWelcomemsg(Usr.email,Usr.name);
+        email.sendWelcomeMsg(Usr.email,Usr.name);
         res.status(201).send({Usr, token}); 
     } catch (error) {
         res.status(400).send(error);
@@ -103,7 +103,7 @@ router.delete('/users/me', auth, async (req,res) => {
     
     try {
         await req.user.remove();
-        email.sendCanelationMessage(req.user.email,req.user.name);
+        email.sendCancelationMsg(req.user.email,req.user.name);
         res.send(req.user);
     } catch (error) {
         res.status(500).send(error);
