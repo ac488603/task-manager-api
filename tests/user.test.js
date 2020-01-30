@@ -1,26 +1,9 @@
 const request = require('supertest');
 const app = require('../app');
 const User = require('../models/User');
-const mongoose =require('mongoose');
-const jwt = require('jsonwebtoken');
+const {userOne, userOneID, setupDatabase} = require('./fixtures/db');
 
-const userOneID =  new mongoose.Types.ObjectId();
-const userOne = {
-    _id: userOneID,
-    name : "buddy",
-    password: "BigMoneyMike",
-    email:"mikemike@example.com",
-    age: 17,
-    tokens:[{
-        token: jwt.sign({_id: userOneID}, process.env.JWT_SECRET)
-    }]
-}
-
-beforeEach(async () => {
-    await User.deleteMany();
-    await new User(userOne).save();
-    
-})
+beforeEach(setupDatabase)
 
 test('should signup new user', async () => {
    const response = await request(app).post('/users').send({
@@ -99,9 +82,8 @@ test('should fail to delete user', async () => {
 
 test('should upload a profile picture', async () => {
     await request(app).post('/users/me/avatar')
-        .attach('avatar','tests/fixtures/profile-pic.jpg')
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
-        .send()
+        .attach('avatar','tests/fixtures/profile-pic.jpg')
         .expect(200)
     
     const usr = await User.findById(userOneID);
