@@ -96,3 +96,36 @@ test('should fail to delete user', async () => {
         .send()
         .expect(401)
 })
+
+test('should upload a profile picture', async () => {
+    await request(app).post('/users/me/avatar')
+        .attach('avatar','tests/fixtures/profile-pic.jpg')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send()
+        .expect(200)
+    
+    const usr = await User.findById(userOneID);
+    //check if avatar property points to a buffer
+    expect(usr.avatar).toEqual(expect.any(Buffer));
+})
+
+test('should edit user name', async () => {
+    await request(app).patch('/users/me')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send({
+            name : "boss man"
+        })
+        .expect(200)
+
+    const user = await User.findById(userOneID);
+    expect(user.name).toBe("boss man");
+})
+
+test('should fail to update invalid field', async () => {
+    await request(app).patch('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({
+        height : "53in"
+    })
+    .expect(400)
+})
